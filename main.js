@@ -33,25 +33,43 @@ class Block {
 
 class Blockchain{
     constructor(transactions) {
-        this.chain = [this.createGenesisBlock(transactions)];
-        this.difficulty = 4;
+        this.chain = [];
+        this.difficulty = 3;
+
     }
 
-    createGenesisBlock(transactions) {
+
+     startMining(transactions,client)
+    {
+    //  var block_id = this.returnPromise(this.getLatestBlock,transactions).then(block => {block_id = block.index + 1;
+    var block_id = this.getLatestBlock().index + 1;
+      this.addBlock(new Block(block_id,"20/07/2017", client.authedId(),{ transactions: [block_id] }),transactions,client);
+
+
+    }
+
+    createAndMine(transactions,client) {
 
           transactions.collection('blockchain').find({index: 0}).limit(1).execute().then(docs => {
               console.log(JSON.stringify(docs));
               if (docs.length > 0)
               {
                 console.log("Got Genesis block");
-                console.log(docs[0]);
-                return new  Block(docs[0].index,docs[0].timestamp,docs[0].owner_id,docs[0].data,docs[0].previousHash);
+                var genesisBlock=docs[0];
+                console.log(genesisBlock);
+
               }
               else {
-                console.log("Created Genesis block")
-                transactions.collection('blockchain').insertOne(new Block(0, "01/01/2017",this.authedId, "Genesis block", "000000000000000000000000000"));
-                return new Block(0, "01/01/2017",client.authedId(), "Genesis block", "000000000000000000000000000");
+                console.log("Created Genesis block");
+                var genesisBlock=new Block(0, new Date(),client.authedId(), "Genesis block", "000000000000000000000000000");
+                transactions.collection('blockchain').insertOne(genesisBlock);
+                transactions.collection('pending_blocks').insertOne(genesisBlock);
+                this.chain.push(genesisBlock);
+
               }
+              this.chain.push(genesisBlock);
+              console.log(transactions);
+              this.startMining(transactions,client);
           }
         ).catch(err => {
           console.error(err)
@@ -59,34 +77,51 @@ class Blockchain{
 
     }
 
-    getLatestBlock() {
-        return this.chain[this.chain.length - 1];
+    returnPromise(func, arg) {
+        return new Promise(func.bind(this, arg));
     }
 
-    addBlock(newBlock,transactions) {
+    getLatestBlock(transactions,resolve) {
+/*
+       console.log(transactions);
+        var chain = this.getLatestChain(transactions).then(doc => {
+            return doc[0].chain[0];
+        }).catch(err => {
+        console.error(err)
+      });
+      resolve(true);
+      */
+     return this.chain[this.chain.length - 1];
+
+    }
+
+    addBlock(newBlock,transactions,client) {
+      console.log("Start Mining Block: " + newBlock.index + "...");
         newBlock.previousHash = this.getLatestBlock().hash;
         newBlock.mineBlock(this.difficulty);
-        transactions.collection('blockchain').insertOne(newBlock);
-        this.chain.push(newBlock);
+        console.log("insert Block into db:",newBlock)
+        try {
+          var coll = transactions.collection("pending_blocks");
+          coll.insertOne(newBlock).then(() =>
+          {  this.chain.push(newBlock);
+             var block_id = newBlock.index + 1;
+             this.addBlock(new Block(block_id,new Date(), client.authedId(),{ transactions: [block_id] }),transactions,client);
+             console.log("Finished Mining block #n: " + newBlock.index  + " HASH: " + newBlock.hash  )  ;
+           }
+          ).catch(err => {
+          console.error(err)
+        });
+      }
+        catch (e) {
+        // handle write error
+        console.log(e.message);
+        return e.message;
+      }
     }
 
-    getLatestChain()
+    getLatestChain(transactions)
     {
-
-      var uri = 'mongodb://blockadmin:block123@blockchaindb-shard-00-00-7yqx5.mongodb.net:27017,blockchaindb-shard-00-01-7yqx5.mongodb.net:27017,blockchaindb-shard-00-02-7yqx5.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin';
-
-      MongoClient.connect(uri, function(err, conn) {
-         const db = conn.db("transactions");
-         const chainColl = db.collection("blockchain");
-
-        chainColl.aggregate([{$graphLookup:
-        { from: "blockchain" , startWith: "$previousHash", "connectFromField" : "hash", connectToField: "previousHash",  as: "chain"}},{ $project : { "chain" : 1, _id : 0}}]).toArray(function(err, docs) {
-            console.log("Got chain block")
-            console.log(JSON.stringify(docs[0]))
-            return this.chain;
-          });
-    });
-
+           return transactions.collection('validChain').find({}).execute();
    }
 
     isChainValid(transactions) {
@@ -116,19 +151,25 @@ class Blockchain{
 
 
 
-const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-wgaty');
+const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
 
 clientPromise.then(client => {
    const transactions = client.service('mongodb', 'mongodb-atlas').db('transactions');
    client.login().then(() => {
-   let miner = { miner_id:  client.authedId(), owner_id: client.authedId(), signInDate : "20/07/2017"};
+   let miner = { miner_id:  client.authedId(), owner_id: client.authedId(), signInDate : new Date(), active : true};
    const assets = client.service('mongodb', 'mongodb-atlas').db('assets');
    nodes = assets.collection('nodes');
    nodes.updateOne({owner_id: client.authedId()}, {$set: miner}, {upsert:true});
 
   MongoDBCoin = new Blockchain(transactions);
-  console.log('Mining block 1...');
-   MongoDBCoin.addBlock(new Block(1,"20/07/2017", client.authedId(),{ amount: 4 }),transactions);
+  transactions.collection("pending_blocks").deleteMany({}).then(() => {MongoDBCoin.createAndMine(transactions,client);}).catch(err => {
+  console.error(err)
+});
+
+});
+
+/*  console.log('Mining block 1...');
+
    console.log('Mining block 2...');
    MongoDBCoin.addBlock(new Block(2, "20/07/2017", client.authedId(),{ amount: 8}),transactions);
 /*
@@ -142,5 +183,4 @@ clientPromise.then(client => {
 
   // console.log("Blockchain valid? " + MongoDBCoin.isChainValid(transactions));
   */
-});
 });
