@@ -1,9 +1,9 @@
 # stitch-blockchain
 Demo for MongoDB stitch as a store for blockchains
 
-# Introduction 
+# Introduction
 
-Revolutionary Blockchain technology meets MongoDB’s empowering backend service and Database for modern applications to create next generation solutions. 
+Revolutionary Blockchain technology meets MongoDB’s empowering backend service and Database for modern applications to create next generation solutions.
 Using Stitch platform will allow us to design and build the next decentralize, trusted and fraud free applications utilizing its newest features.
 
 # Overview
@@ -19,7 +19,44 @@ Using Stitch platform will allow us to design and build the next decentralize, t
 2. [Import](https://docs.mongodb.com/stitch/import-export/create-stitch-app/) the stitch skelaton app from this repo: stitch-blockchain.tar.gz.
 3. Create the following view in your cluster under database `transactions`:
 ```
-db.createView("blockchain","pending_blocks",[{}]);
+db.createView("blockchain","pending_blocks",
+			[	{
+					"$match" : {
+						"index" : 0
+					}
+				},
+				{
+					"$graphLookup" : {
+						"from" : "pending_blocks",
+						"startWith" : "$previousHash",
+						"connectFromField" : "hash",
+						"connectToField" : "previousHash",
+						"as" : "chain"
+					}
+				},
+				{
+					"$unwind" : "$chain"
+				},
+				{
+					"$sort" : {
+						"chain.index" : 1
+					}
+				},
+				{
+					"$group" : {
+						"_id" : "$_id",
+						"chain" : {
+							"$push" : "$chain"
+						}
+					}
+				},
+				{
+					"$project" : {
+						"chain" : 1,
+						"_id" : 0
+					}
+				}
+			]);
 ```
 4. Create a mongodb readOnly user on all databases.
 5. Start the producing nodes and provide the prompted MongoDB credentials created in 5:
