@@ -130,37 +130,37 @@ class Blockchain{
      const changeStream = db.collection('pending_blocks').watch(pipeline);
 
      // Using the changestream to receive all the notifications for currently waiting blocks
-     var handleBlockNotification = (function(err,next) {
+     var handleBlockNotification = (function(change) {
 
-         if (err)
-         {
-           console.error(err);
-           return;
-         }
-
-           if ((next.fullDocument.index == newBlock.index))
+      /*     if (err)
            {
-             if (client.authedId() == next.fullDocument.owner_id){
+             console.error(err);
+             return;
+           }*/
+
+           if ((change.fullDocument.index == newBlock.index))
+           {
+             if (client.authedId() == change.fullDocument.owner_id){
                  // If the notification is about our block no need to verify
-                  console.log("The received notification was about block: " + next.fullDocument.index + " which was mined by us: " + next.fullDocument.owner_id);
+                  console.log("The received notification was about block: " + change.fullDocument.index + " which was mined by us: " + change.fullDocument.owner_id);
              }
            }
            else {
                 // If the notification is about someone else block we need to approve it
-                console.log("Stream received!!! The received notification is about historical block: " + next.fullDocument.index + " which was produced by: " + next.fullDocument.owner_id);
+                console.log("Stream received!!! The received notification is about historical block: " + change.fullDocument.index + " which was produced by: " + change.fullDocument.owner_id);
 
-                if (this.verifyBlock(next.fullDocument,transactions,client))
+                if (this.verifyBlock(change.fullDocument,transactions,client))
                 {
-                  console.log(chalk.green("Approved block: " + next.fullDocument.index + " which was produced by: " + next.fullDocument.owner_id));
+                  console.log(chalk.green("Approved block: " + change.fullDocument.index + " which was produced by: " + change.fullDocument.owner_id));
                 }
                 else {
-                  console.log("Rejected block: " + next.fullDocument.index + " which was produced by: " + next.fullDocument.owner_id);
+                  console.log("Rejected block: " + change.fullDocument.index + " which was produced by: " + change.fullDocument.owner_id);
                 }
            }
-          changeStream.next().then((next,err) => {handleBlockNotification(err,next);}).catch(err => {console.error(err);});
+          //changeStream.next().then((next,err) => {handleBlockNotification(err,next);}).catch(err => {console.error(err);});
          }).bind(this);
 
-     changeStream.next(handleBlockNotification).catch(err => {console.error(err);});
+     changeStream.on("change",handleBlockNotification);
 
      // Start from a new block
      var block_id = this.getLatestBlock().index + 1;
