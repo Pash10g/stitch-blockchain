@@ -16,13 +16,14 @@ Using Stitch platform will allow us to design and build the next decentralize, t
 
 # Configuring and running
 1. Setup an Atlas cluster and stitch. See the following [documentation](https://docs.mongodb.com/stitch/getting-started/).
-2. [Import](https://docs.mongodb.com/stitch/import-export/create-stitch-app/) the stitch skelaton app from this repo: stitch-blockchain.tar.gz.
+2. [Import](https://docs.mongodb.com/stitch/import-export/create-stitch-app/) the stitch skelaton app from this repo: stitch-blockchain.zip.
 3. Create the following view in your cluster under database `transactions`:
 ```
 db.createView("blockchain","pending_blocks",
 			[	{
 					"$match" : {
-						"index" : 0
+						"index" : 0,
+						"approvedByMajority" : true
 					}
 				},
 				{
