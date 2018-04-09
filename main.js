@@ -36,7 +36,7 @@ class Block {
     }
     // Once produced the current node can approve the block.
     this.approvals.push(this.owner_id);
-    console.log("BLOCK PRODUCED: " + this.hash);
+    console.log(chalk.blue("BLOCK PRODUCED: " + this.hash));
   }
 }
 
@@ -116,7 +116,7 @@ class Blockchain{
               this.startPrduce(transactions,client,atlasConn);
           }
         ).catch(err => {
-          console.error(err)
+        //  console.error(err)
         });
 
     }
@@ -183,7 +183,7 @@ class Blockchain{
     addBlock(newBlock,transactions,client,changeStream) {
 
       // Adding a new block
-      console.log("Start Producing Block: " + newBlock.index + "...");
+      console.log(chalk.yellow("Start Producing Block: " + newBlock.index + "..."));
         newBlock.previousHash = this.getLatestBlock().hash;
         // Working on producing the correct hash.
         newBlock.produceBlock(this.difficulty);
@@ -205,16 +205,16 @@ class Blockchain{
                 if (docs.length > 0)
                 {
                   this.chain=docs[0].chain;
-                  var block_id = this.getLatestBlock().index + this.difficulty;
+                  var block_id = this.getLatestBlock().index + this.difficulty - 1;
                   setTimeout(this.addBlock.bind(this),100,new Block(block_id,new Date(), client.authedId(),{ transactions: [block_id] }),transactions,client,changeStream);
-                  console.log("Block #n: " + newBlock.index  + " was produced by another node : " + this.getLatestBlock().owner_id +" Moving to the next one: " + block_id )  ;
+                  console.log(chalk.yellow("Block #n: " + newBlock.index  + " was produced by another node : " + this.getLatestBlock().owner_id +" Moving to the next one: " + block_id ))  ;
                 }
-              }).catch(err => {console.error(err);});
+              }).catch(err => {/*console.error(err);*/});
         });
       }
       catch (e) {
       // handle write error
-      console.error(e.message)
+      //console.error(e.message)
     }
   }
 
@@ -231,7 +231,7 @@ class Blockchain{
             // Once approved push approval to the store
             block.approvals.push(client.authedId());
             transactions.collection('pending_blocks').updateOne({index: block.index},{$set: {"approvals" : block.approvals}}).then(()=>{
-            return true;}).catch(err => {console.error(err);});
+            return true;}).catch(err => {/*console.error(err);*/});
             return true;
           }
 
