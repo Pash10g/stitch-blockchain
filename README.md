@@ -59,8 +59,8 @@ db.createView("blockchain","pending_blocks",
 				}
 			]);
 ```
-4. Create a mongodb readOnly user on all databases.
-5. Start the producing nodes and provide the prompted MongoDB credentials created in 5:
+4. Create a mongodb readOnly user on all databases. Verify that the cluster name in the imported application is associated with your cluster name.
+5. Edit the `main.js` file with the MongoDB credentials created in 5 and the correct connection string for your Atlas cluster. Run the production of the blocks with:
 ```
 node main.js
 ```
