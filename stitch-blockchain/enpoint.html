@@ -1,0 +1,114 @@
+<html>
+
+<script src="https://s3.amazonaws.com/stitch-sdks/js/library/v3/stable/stitch.min.js"></script>
+<script>
+const loginForm = document.getElementById("login-form");
+const logoutButton = document.getElementById("logout-button");
+const statusMessage = document.getElementById("auth-type-identifier");
+var stitchClient;
+
+  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
+  clientPromise.then(client => {
+    const db = client.service('mongodb', 'mongodb-atlas').db('transactions');
+    stitchClient = client;
+    if (stitchClient.authedId()) {
+      stitchClient.logout();
+    }
+  }).catch(err => console.error(err));
+
+  function handleLogin() {
+  getLoginFormInfo()
+    .then(user => emailPasswordAuth(user.email, user.password))
+    .catch(err => console.error(err));
+  }
+  function emailPasswordAuth(email, password) {
+    console.log ("email:" + email , "password:" + password);
+//  if (stitchClient.authedId()) {
+  //  return hideLoginForm()
+  //}
+  return stitchClient.login(email, password)
+           .then(() => {stitchClient.executeFunction('retGeo');
+            document.getElementById("login-status").innerText = "Logged in... Submiting to blockchain...";
+            setTimeout(function() {document.getElementById("block-status").innerText = "Block Submited.";  }, 1000);
+            setTimeout(function() {document.getElementById("block-status").innerText = "";document.getElementById("login-status").innerText = ""  }, 5000);
+            }).catch(err => {
+           console.error(err)
+         });
+}
+
+
+
+/* UI Management Functions */
+function getLoginFormInfo() {
+  const emailEl = document.getElementById("emailInput");
+  const passwordEl = document.getElementById("passwordInput");
+  // Parse out input text
+  const email = emailEl.value;
+  const password = passwordEl.value;
+  // Remove text from login boxes
+  //emailEl.value = "";
+  //passwordEl.value = "";
+  return new Promise(resolve => resolve({ email: email, password: password }));
+}
+
+function hideLoginForm() {
+  return stitchClient.userProfile().then(user => {
+    // Hide login form
+    loginForm.classList.add("hidden");
+    // Set login status message
+    statusMessage.innerText = "Logged in as: " + user.data.email;
+  });
+};
+
+</script>
+
+<body>
+  <h1 align="center" class="page-title">$$$ Bank Block-Check Kings $$$</h1>
+  <h3 align="center" id="auth-type-identifier">Log in to view your account details</h3>
+  <div class="login-container">
+
+    <div id="login-form" align="center">
+      <br>
+      <div class="form-group">
+        <label for="emailInput">Email:</label>
+        <input type="text" class="form-control" id="emailInput" placeholder="user@example.com"  />
+      </div>
+      <br>
+      <div class="form-group">
+        <label for="passwordInput">Password:</label>
+        <input type="text" class="form-control" id="passwordInput" placeholder="mypassword"/>
+      </div>
+      <button type="submit" id="login-button" class="btn btn-primary" onclick="handleLogin()">Log In</button>
+    </div>
+
+  </div>
+
+  <div class="dashboard-container hidden" id="dashboard-container">
+    <br>
+    <div id="login-status" class="centered" align="center" color="green">
+    </div>
+    <br>
+    <div id="block-status" class="centered" align="center" color="green">
+    </div>
+</div>
+    <!-- Show popular toppings data from the getRecentTopopings webhook
+    <div class="popular-toppings">
+      <h2 class="centered">Popular Toppings</h2>
+      <table id="toppingstable" class="table">
+        <tr>
+          <th class="fixed-width">Topping</th>
+          <th class="fixed-width"># Recent Orders</th>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Chart order totals in real time with data from the salesTimeline function
+    <div id="sales-timeline">
+      <h2 class="centered">Recent Pizza Sales</h2>
+      <div id="graph1" class="aGraph" />
+    </div>
+
+  -->
+
+</body>
+</html>
