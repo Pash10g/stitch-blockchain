@@ -164,29 +164,34 @@ class Blockchain{
          const profiles_pipe = [
               { $match: { "operationType" : "insert" } }
             ];
-            const profilesStream = db.collection('profiles').watch(profiles_pipe);
+            const profilesColl = db.collection('profiles');
 
+
+            const profilesStream = profilesColl.watch(profiles_pipe);
             var handleProfileNotification = (function(change) {
+            console.log("Stream received!!! The received notification ip: " + change.fullDocument.ip + " which was produced by country: " + change.fullDocument.country_name);
+            // Handle a n
+            var handleFindAndModify =  (function(err, doc){
 
-       /*     if (err)
-            {
-              console.error(err);
-              return;
-            }*/
+                if (doc.lastErrorObject.n > 0)
+                {
+                  if (this.verifyProfile(change.fullDocument))
+                  {
+                    this.currentBlocksData.push(change.fullDocument);
+                    console.log(chalk.green("Approved and pushed profile: " + change.fullDocument.user_id));
+                  }
+                  else {
+                    console.log("Rejected profile: " + change.fullDocument.user_id  );
+                  }
+                }
+                else {
+                    console.log(chalk.red("Profile: " + change.fullDocument.user_id + "is already placed in a pending block "));
+                }
+            }).bind(this);
 
 
-             // If the notification is about someone else block we need to approve it
-             console.log("Stream received!!! The received notification ip: " + change.fullDocument.ip + " which was produced by country: " + change.fullDocument.country_name);
-
-             if (this.verifyProfile(change.fullDocument))
-             {
-               this.currentBlocksData.push(change.fullDocument);
-               console.log(chalk.green("Approved and pushed profile: " + change.fullDocument.user_id));
-             }
-             else {
-               console.log("Rejected profile: " + change.fullDocument.index );
-             }
-
+             profilesColl.findOneAndUpdate({_id: change.fullDocument._id, consumed: false }, {$set: {consumed: true, blockchain_block: this.getLatestBlock().index + 1}}, { returnOriginal: false, upsert: false},
+             handleFindAndModify);
            //changeStream.next().then((next,err) => {handleBlockNotification(err,next);}).catch(err => {console.error(err);});
           }).bind(this);
 
@@ -199,10 +204,10 @@ class Blockchain{
 
       // Start from a new block
       var block_id = this.getLatestBlock().index + 1;
-
+       console.log("Waiting for incoming logins...");
       var waitForLogin = (function()
-        { console.log("Waiting for incoming logins..."); if(this.currentBlocksData.length > 0) { clearInterval(timeout);
-          var newBlock = new Block(block_id,new Date(), client.authedId(),this.currentBlocksData.length );
+        { if(this.currentBlocksData.length > 0) { clearInterval(timeout);
+          var newBlock = new Block(block_id,new Date(), client.authedId(),this.currentBlocksData);
           this.addBlock(newBlock,transactions,client);
    } }).bind(this);
       var timeout = setInterval(waitForLogin, 500);
@@ -239,10 +244,11 @@ class Blockchain{
           var coll = transactions.collection("pending_blocks");
           coll.insertOne(newBlock).then(() =>
           {
+            console.log("Waiting for incoming logins...");
             this.chain.push(newBlock);
             var block_id = newBlock.index + 1;
             var waitForLogin = (function()
-            { console.log("Waiting for incoming logins..."); if(this.currentBlocksData.length > 0) { clearInterval(timeout);
+            {  if(this.currentBlocksData.length > 0) { clearInterval(timeout);
                 setTimeout(this.addBlock.bind(this),100,new Block(block_id,new Date(), client.authedId(),this.currentBlocksData),transactions,client);
               } }).bind(this);
             var timeout = setInterval(waitForLogin, 500);
@@ -250,7 +256,6 @@ class Blockchain{
              console.log("Finished producing block #n: " + newBlock.index  + " HASH: " + newBlock.hash  )  ;
            }
           ).catch(err => {
-
             transactions.collection('blockchain').find({}).execute().then(docs => {
                 if (docs.length > 0)
                 {
@@ -291,7 +296,7 @@ class Blockchain{
 
 function main() {
   // Create Stitch class
-  const clientPromise = stitch.StitchClientFactory.create('<application_id>');
+  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
 
   clientPromise.then(client => {
      const transactions = client.service('mongodb', 'mongodb-atlas').db('transactions');
