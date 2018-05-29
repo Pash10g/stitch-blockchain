@@ -126,12 +126,18 @@ class Blockchain{
 
     }
 
-    handleChangeStreams (transactions,client) {
-      const pipeline = [
-           { $match: {'fullDocument.owner_id'  : {  "$ne" : client.authedId() }, "operationType" : "insert" } }
-         ];
-   var db = atlasConn.db('transactions');
-   const changeStream = db.collection('pending_blocks').watch(pipeline);
+   handleChangeStreams (transactions,client) {
+
+        // Confiugre change pipeline
+        const pipeline = [
+               { $match: {'fullDocument.owner_id'  : {  "$ne" : client.authedId() },
+               "operationType" : "insert" } }
+             ];
+        // Get collection and set a change stream
+         var db = atlasConn.db('transactions');
+         const changeStream = db.collection('pending_blocks').watch(pipeline);
+
+
 
    // Using the changestream to receive all the notifications for currently waiting blocks
    var handleBlockNotification = (function(change) {
@@ -156,46 +162,53 @@ class Blockchain{
 
         //changeStream.next().then((next,err) => {handleBlockNotification(err,next);}).catch(err => {console.error(err);});
        }).bind(this);
-
+      // Listen on changes
        changeStream.on("change",handleBlockNotification);
 
 
-
-         const profiles_pipe = [
-              { $match: { "operationType" : "insert" } }
+        // Listen for incoming logins
+         const logins_4_chain_pipe = [
+              { $match: { "operationType" : { "$in" : ["insert","update"] }, "fullDocument.blockchain_data.consumed" : false } }
             ];
-            const profilesColl = db.collection('profiles');
+            const logins_4_chainColl = db.collection('logins_4_chain');
 
 
-            const profilesStream = profilesColl.watch(profiles_pipe);
-            var handleProfileNotification = (function(change) {
-            console.log("Stream received!!! The received notification ip: " + change.fullDocument.ip + " which was produced by country: " + change.fullDocument.country_name);
-            // Handle a n
+            const logins_4_chainStream = logins_4_chainColl.watch(logins_4_chain_pipe,{fullDocument : "updateLookup" });
+            var handleProfileNotification = (async function(change) {
+            console.log("Stream received!!! The received notification ip: " + change.fullDocument.blockchain_data.ip + " which was produced by country: " + change.fullDocument.blockchain_data.country_name + " loginTime: " + change.fullDocument.blockchain_data.loginTime);
+             var docs =  await transactions.collection('profiles').find({"user_id" : change.fullDocument.user_id},{_id : 0}).execute().catch((err) => { console.log(err); });/*.then(docs => {*/
+            if (docs.length > 0)
+            {
+              change.fullDocument.blockchain_data.shared_info=docs[0];
+              console.log("Added the following shared_info :" + JSON.stringify(docs[0]) );
+            }
+
+            // Handle incoming login verification and classification of data shared with the block
             var handleFindAndModify =  (function(err, doc){
 
                 if (doc.lastErrorObject.n > 0)
                 {
                   if (this.verifyProfile(change.fullDocument))
                   {
-                    this.currentBlocksData.push(change.fullDocument);
-                    console.log(chalk.green("Approved and pushed profile: " + change.fullDocument.user_id));
+                    this.currentBlocksData.push(change.fullDocument.blockchain_data);
+                    console.log(chalk.green("Approved and pushed profile: " + change.fullDocument.user_id + " with loginTime: " + change.fullDocument.blockchain_data.loginTime));
                   }
                   else {
                     console.log("Rejected profile: " + change.fullDocument.user_id  );
                   }
                 }
                 else {
-                    console.log(chalk.red("Profile: " + change.fullDocument.user_id + "is already placed in a pending block "));
+                    console.log(chalk.red("Profile: " + change.fullDocument.user_id + " is already placed in a pending block "));
                 }
             }).bind(this);
 
-
-             profilesColl.findOneAndUpdate({_id: change.fullDocument._id, consumed: false }, {$set: {consumed: true, blockchain_block: this.getLatestBlock().index + 1}}, { returnOriginal: false, upsert: false},
+             // Update consumed login
+             logins_4_chainColl.findOneAndUpdate({_id: change.fullDocument._id, "blockchain_data.consumed" : false } ,{"$push" : { "blockchain_data.blocks_ids" : this.getLatestBlock().index + 1}, $set: { "blockchain_data.consumed": true }}, { returnOriginal: false, upsert: false},
              handleFindAndModify);
-           //changeStream.next().then((next,err) => {handleBlockNotification(err,next);}).catch(err => {console.error(err);});
+
           }).bind(this);
 
-          profilesStream.on("change",handleProfileNotification);
+          logins_4_chainStream.on("change",handleProfileNotification);
     }
 
     startPrduce(transactions,client){
@@ -237,7 +250,7 @@ class Blockchain{
         // Working on producing the correct hash.
         newBlock.produceBlock(this.difficulty);
 
-        this.currentBlocksData=[];
+
 
         try {
           // Write blocks to the database
@@ -249,22 +262,24 @@ class Blockchain{
             var block_id = newBlock.index + 1;
             var waitForLogin = (function()
             {  if(this.currentBlocksData.length > 0) { clearInterval(timeout);
-                setTimeout(this.addBlock.bind(this),100,new Block(block_id,new Date(), client.authedId(),this.currentBlocksData),transactions,client);
+                this.addBlock(new Block(block_id,new Date(), client.authedId(),this.currentBlocksData),transactions,client);
               } }).bind(this);
             var timeout = setInterval(waitForLogin, 500);
 
              console.log("Finished producing block #n: " + newBlock.index  + " HASH: " + newBlock.hash  )  ;
+             this.currentBlocksData=[];
            }
+
           ).catch(err => {
             transactions.collection('blockchain').find({}).execute().then(docs => {
                 if (docs.length > 0)
                 {
                   this.chain=docs[0].chain;
                   var block_id = this.getLatestBlock().index + this.difficulty - 1;
-                  setTimeout(this.addBlock.bind(this),100,new Block(block_id,new Date(), client.authedId(),this.currentBlocksData),transactions,client,changeStream);
+                  this.addBlock(new Block(block_id,new Date(), client.authedId(),this.currentBlocksData),transactions,client);
                   console.log(chalk.yellow("Block #n: " + newBlock.index  + " was produced by another node : " + this.getLatestBlock().owner_id +" Moving to the next one: " + block_id ))  ;
                 }
-              }).catch(err => {/*console.error(err);*/});
+              }).catch(err => {console.error(err);});
         });
       }
       catch (e) {
@@ -286,7 +301,7 @@ class Blockchain{
             // Once approved push approval to the store
             block.approvals.push(client.authedId());
             transactions.collection('pending_blocks').updateOne({index: block.index},{$set: {"approvals" : block.approvals}}).then(()=>{
-            return true;}).catch(err => {/*console.error(err);*/});
+            transactions.collection('pending_blocks').updateOne({index: block.index},{$set: { "approvedByMajority" : true} })}).catch(err => {/*console.error(err);*/});
             return true;
           }
 
@@ -309,7 +324,7 @@ function main() {
        nodes.updateOne({owner_id: client.authedId()}, {$set: producer}, {upsert:true}).then(() => {
 
        // Connect directly to the Atlas instance for changeStream
-        var uri = "mongodb://<atlasUser>:<atlasPassword>@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
+        var uri = "mongodb://blockadmin:block123@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
         MongoClient.connect(uri, function(err, db) {
           console.log("#########################################");
           console.log("####  Node: " + client.authedId() + " is up and starting to produce at : " + new Date());
@@ -321,10 +336,10 @@ function main() {
           }
 
           // Initiate the chain
-           MongoDBCoin = new Blockchain();
+           MongoDBChain = new Blockchain();
            // Start producing and approving blocks
             atlasConn = db;
-           MongoDBCoin.approveAndPrduce(transactions,client,db);
+           MongoDBChain.approveAndPrduce(transactions,client,db);
          });
      });
 

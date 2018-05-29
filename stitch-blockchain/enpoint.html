@@ -5,18 +5,83 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
 <script src="https://s3.amazonaws.com/stitch-sdks/js/library/v3/stable/stitch.min.js"></script>
 <script src="./animation.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
   <h1 align="center" class="page-title" >$$$ Bank Block-Check Kings $$$</h1>
   <h3 align="center" id="auth-type-identifier">Log in to view your account details</h3>
-  <br>
-  <div id="login-status" class="centered" align="center" color="green">
-  </div>
-  <br>
-  <div id="block-status" class="centered" align="center" color="green">
-  </div>
-  <div align="center" >
-    <i id="waiting" class="fa fa-spinner fa-spin" style="visibility: hidden;"></i>
+  <div   id="account_details" style="visibility: hidden; display: none">
+    <table width="677" height="5">
+<tbody>
+<tr>
+<td style="width: 162px; text-align: center;"><strong>Username:</strong>&nbsp; &nbsp;user1@example.com&nbsp;</td>
+<td style="width: 162px; text-align: center;">
+<p><strong>First Name:</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Pavel&nbsp;</p>
+</td>
+<td style="width: 162px; text-align: center;"><strong>Last Name:</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Duchovny&nbsp;</td>
+<td style="width: 163px; text-align: center;"><strong>Date of birth:</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 18/02/1986&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<table border="1px;" style="width: 673px; margin-left: auto; margin-right: auto;">
+<tbody>
+<tr style="height: 32.875px;">
+<td style="width: 162px; height: 32.875px;"><strong>Savings:</strong></td>
+<td style="width: 195px; height: 32.875px;"><strong>Credit</strong></td>
+<td style="width: 129px; height: 32.875px;"><strong>Checkings</strong></td>
+</tr>
+<tr style="height: 128px;">
+<td style="width: 162px; height: 128px;">
+<p>Account number&nbsp;: 180663762231</p>
+<p>Balance" : 32221</p>
+</td>
+<td style="width: 195px; height: 128px;">
+<p>Card ending : 4413&nbsp;</p>
+<p>Outstanding balance: 22077</p>
+<p></p>
+</td>
+<td style="width: 129px; height: 128px;">
+<p>Account number : 180663733231</p>
+<p>Balance : 77643</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p style="text-align: center;">Security Settings</p>
+<table width="589" height="50" style="margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="width: 139px; text-align: center;">
+<p>&nbsp;<input height="50" type="checkbox" id="subscribeCreditScore" name="subscribePrivacy" value="CreditScore" /> <label for="subscribeNews">Allow to share your Credit Score?</label></p>
+<p>Partner to share this infomration with:</p>
+<form><select name="partenrs" multiple="multiple">
+<option value="BankA">BankA</option>
+<option value="BankB">BankB</option>
+<option value="BankC">BankC</option>
+<option value="Everyone">Everyone</option>
+</select><input type="submit" /></form></td>
+<td style="width: 139px; text-align: center;">
+<p>&nbsp;<input type="checkbox" id="subscribeCreditScore" name="subscribePrivacy" value="CreditScore" /> <label for="subscribeNews">Allow to share your Date of Birth?</label></p>
+<p>Partner to share this infomration with:</p>
+<form><select name="partenrs" multiple="multiple">
+<option value="BankA">BankA</option>
+<option value="BankB">BankB</option>
+<option value="BankC">BankC</option>
+<option value="Everyone">Everyone</option>
+</select><input type="submit" /></form></td>
+<td style="width: 141px;">
+<p style="text-align: center;">&nbsp;<input type="checkbox" id="subscribeCreditScore" name="subscribePrivacy" value="CreditScore" /> <label for="subscribeNews">Allow to share your User Info?</label></p>
+<p style="text-align: center;">Partner to share this infomration with:</p>
+<form><select name="partenrs" multiple="multiple">
+<option value="BankA">BankA</option>
+<option value="BankB">BankB</option>
+<option value="BankC">BankC</option>
+<option value="Everyone">Everyone</option>
+</select><input type="submit" /></form></td>
+</tr>
+</tbody>
+</table>
   </div>
   <!-- div class="login-container">
 
@@ -40,7 +105,22 @@
 
 
 </div -->
-<form>
+
+  <!--h1 id="user_email">John Doe</h1>
+  <p class="title" id="account_number">CEO & Founder, Example</p>
+  <p  id="balance">Harvard University</p>
+  div style="visibility: hidden;">
+
+
+    <a href="#"><i class="fa fa-dribbble"></i></a>
+    <a href="#"><i class="fa fa-twitter"></i></a>
+    <a href="#"><i class="fa fa-linkedin"></i></a>
+    <a href="#"><i class="fa fa-facebook"></i></a>
+ </div-->
+
+</div>
+<div>
+<form id="login-form" onsubmit="return false;">
   <div class="svgContainer">
     <div>
       <svg class="mySVG" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200">
@@ -145,6 +225,8 @@
     <button id="login-button" >Log in</button>
   </div>
 </form>
+</div>
+<div id="login-status" class="centered" align="center" color="green"><h1><i id="waiting" align="center" class=" fa fa-spinner fa-spin" ></i><h1></div>
 
 </body>
 

@@ -3,6 +3,8 @@ window.onload=function(){
 var email = document.querySelector("#email"),
 	password = document.querySelector("#password"),
 	button = document.querySelector("#login-button"),
+	form = document.querySelector("#login-form"),
+	icon = document.querySelector("#waiting"),
 	mySVG = document.querySelector(".svgContainer"),
 	armL = document.querySelector(".armL"),
 	armR = document.querySelector(".armR"),
@@ -40,6 +42,8 @@ var caretPos,
 	eyeRDistV,
 	eyeDistR,
 	mouthStatus = "small";
+
+var assets_shared = {};
 
 function getCoord(e) {
 	var carPos = email.selectionEnd,
@@ -343,26 +347,29 @@ function getPosition(el) {
   //  return hideLoginForm()
   //}
   console.log(stitchClient);
-  var ret = stitchClient.login(email, password)
+  return stitchClient.login(email, password)
            .then(() => {
 						 console.log("in promise");
-						//stitchClient.executeFunction('retGeo');
+						 assets_shared = [ "DOB" , "credit_score"];
+						stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000" );
             document.getElementById("login-status").innerText = "Logged in... Submiting to blockchain...";
-            /*document.getElementById("waiting").style.visibility = 'visible';
-            setTimeout(function() {document.getElementById("block-status").innerText = "Block Submited.";  }, 10000);
-            setTimeout(function() {document.getElementById("block-status").innerText = "";
-            document.getElementById("login-status").innerText = "";
-            document.getElementById("auth-type-identifier").innerText = "Successfully identified!";
-            document.getElementById("waiting").style.visibility = 'hidden'}, 20000);*/
+          //  icon.style.visibility = 'visible';
+            setTimeout(function() {document.getElementById("login-status").innerText = "Block Submited.";  }, 5000);
+            setTimeout(function() {document.getElementById("login-status").innerText = "";
+            document.getElementById("auth-type-identifier").innerText = "Successfully Identified! Logged in as:" + email;
+          //  document.getElementById("waiting").style.visibility = 'hidden';
+						hideLoginForm();
+							//  icon.style.visibility = 'visible';
+							document.getElementById("account_details").style.display = 'block';
+									document.getElementById("account_details").style.visibility = 'visible';
+								}, 10000);
             }).catch(err => {
 							console.log("in error promise");
-           console.error(err);
-            // document.getElementById("login-status").innerText = "Error: " + err.message;
+           	console.error(err);
+            document.getElementById("login-status").innerText = "Error: " + err.message;
          });
-	console.log("pavel");
 	return ret;
 }
-
 
 
 /* UI Management Functions */
@@ -379,12 +386,9 @@ function getLoginFormInfo() {
 }
 
 function hideLoginForm() {
-  return stitchClient.userProfile().then(user => {
-    // Hide login form
-    loginForm.classList.add("hidden");
-    // Set login status message
-    statusMessage.innerText = "Logged in as: " + user.data.email;
-  });
+    form.style.visibility = 'hidden';
+		form.style.display = 'none';
+  //  statusMessage.innerText = "Logged in as: " + user.data.email;
 };
 
 const loginForm = document.getElementById("login-form");
@@ -407,16 +411,16 @@ email.addEventListener("input", onEmailInput);
 password.addEventListener("focus", onPasswordFocus);
 password.addEventListener("blur", onPasswordBlur);
 button.addEventListener("click", handleLogin)
-/*TweenMax.set(armL, {
-	x: -93,
+TweenMax.set(armL, {
+	x: -90,
 	y: 220,
 	rotation: 105,
 	transformOrigin: "top left"
 });
 TweenMax.set(armR, {
-	x: -93,
+	x: -90,
 	y: 220,
 	rotation: -105,
 	transformOrigin: "top right"
-});*/
+});
 }
