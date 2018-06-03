@@ -15,7 +15,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-form {
+form .login-form {
   position: relative;
   top: 300;
   left: 50%;
@@ -100,7 +100,7 @@ form input[type='email']:focus, form input[type="text"]:focus, form input[type='
 form input[type='email'], form input[type="text"] {
   padding: 14px 1em 0px;
 }
-form button {
+.submit-button {
   display: block;
   margin: 0;
   padding: .65em 1em 1em;
@@ -149,11 +149,7 @@ form .inputGroup1.focusWithText .helper {
 
 }
 
-i {
-  visibility: hidden;
-  position: relative;
-  margin-left: 0%;
-}
+
 
 .account {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);

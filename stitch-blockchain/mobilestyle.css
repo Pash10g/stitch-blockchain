@@ -1,0 +1,142 @@
+.post-login-header {
+  background-color: #13AA52;
+  padding-top: 50px;
+  padding-bottom: 26px;
+  color: #FFF;
+  text-align: center;
+}
+
+.fa-check {
+  color: #FFF;
+  background-color: #13AA52;
+  border-radius: 10px;
+  font-size: 9pt;
+
+}
+
+.share_settings {
+  padding-bottom: 5px;
+  padding-left: 10px;
+  font-size: 9pt;
+}
+
+.account_first {
+  background-color: #138eaa;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  color: #FFF;
+}
+
+.account_second {
+  background-color: #138edd;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  color: #FFF;
+}
+
+.account_third {
+  background-color: #138eff;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  color: #FFF;
+}
+
+img.provider-logo {
+  -webkit-filter: grayscale(100%);
+   -moz-filter: grayscale(100%);
+   filter: grayscale(100%);
+   transition: all 0.5s ease;
+}
+
+img.provider-logo:hover {
+  -webkit-filter: grayscale(0%);
+   -moz-filter: grayscale(0%);
+   filter: grayscale(0%);
+}
+
+.provider-logo-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+.logo-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 83px;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  z-index: -1;
+  transition: .3s ease;
+
+}
+
+.submit-settings-container {
+  padding-top: 100px;
+  padding-left: 27%;
+}
+
+.providers-title {
+  padding-left: 5px;
+  color: gray;
+}
+
+.providers-logos {
+  padding-top: 15px;
+}
+
+.identified-first {
+  padding-top: 200px;
+  padding-left: 34%;
+}
+
+.identified-second {
+  padding-top: 20px;
+  text-align: center;
+  color: #5353b3;
+  font-size: 18pt;
+}
+
+.identified-third {
+  padding-top: 12px;
+  text-align: center;
+  color: #aba9a9;
+}
+
+.identified-fourth {
+  padding-top: 20px;
+  padding-left: 34%;
+}
+
+.cancel-link {
+  padding-right: 5%;
+}
+
+.assets-title {
+  padding-left: 14%;
+}
+
+.assets-dollar-suffix {
+  vertical-align: super;
+}
+
+.assets-value {
+  font-size: 20pt;
+}
+
+.center-device {
+  margin-left: 33%;
+}
+
+.login-screen {
+  padding: 40px;
+}
+
+.waiting {
+  display: none !important;
+  position: relative;
+  margin-left: 0%;
+}

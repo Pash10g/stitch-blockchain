@@ -1,5 +1,5 @@
 
-window.onload=function(){
+var initAnimation=function(){
 var email = document.querySelector("#email"),
 	password = document.querySelector("#password"),
 	button = document.querySelector("#login-button"),
@@ -28,6 +28,7 @@ var email = document.querySelector("#email"),
 	earHairL = document.querySelector(".earL .earHair"),
 	earHairR = document.querySelector(".earR .earHair"),
 	hair = document.querySelector(".hair");
+  
 var caretPos,
 	curEmailIndex,
 	screenCenter,
@@ -333,84 +334,12 @@ function getPosition(el) {
 }
 
 
-
-
-  function handleLogin() {
-    console.log("button clicked");
-  getLoginFormInfo()
-    .then(user => emailPasswordAuth(user.email, user.password))
-    .catch(err => console.error(err));
-  }
-  function emailPasswordAuth(email, password) {
-    console.log ("email:" + email , "password:" + password);
-//  if (stitchClient.authedId()) {
-  //  return hideLoginForm()
-  //}
-  console.log(stitchClient);
-  return stitchClient.login(email, password)
-           .then(() => {
-						 console.log("in promise");
-						 assets_shared = [ "DOB" , "credit_score"];
-						stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000" );
-            document.getElementById("login-status").innerText = "Logged in... Submiting to blockchain...";
-          //  icon.style.visibility = 'visible';
-            setTimeout(function() {document.getElementById("login-status").innerText = "Block Submited.";  }, 5000);
-            setTimeout(function() {document.getElementById("login-status").innerText = "";
-            document.getElementById("auth-type-identifier").innerText = "Successfully Identified! Logged in as:" + email;
-          //  document.getElementById("waiting").style.visibility = 'hidden';
-						hideLoginForm();
-							//  icon.style.visibility = 'visible';
-							document.getElementById("account_details").style.display = 'block';
-									document.getElementById("account_details").style.visibility = 'visible';
-								}, 10000);
-            }).catch(err => {
-							console.log("in error promise");
-           	console.error(err);
-            document.getElementById("login-status").innerText = "Error: " + err.message;
-         });
-	return ret;
-}
-
-
-/* UI Management Functions */
-function getLoginFormInfo() {
-  const emailEl = document.getElementById("email");
-  const passwordEl = document.getElementById("password");
-  // Parse out input text
-  const email = emailEl.value;
-  const password = passwordEl.value;
-  // Remove text from login boxes
-  //emailEl.value = "";
-  //passwordEl.value = "";
-  return new Promise(resolve => resolve({ email: email, password: password }));
-}
-
-function hideLoginForm() {
-    form.style.visibility = 'hidden';
-		form.style.display = 'none';
-  //  statusMessage.innerText = "Logged in as: " + user.data.email;
-};
-
-const loginForm = document.getElementById("login-form");
-const logoutButton = document.getElementById("logout-button");
-const statusMessage = document.getElementById("auth-type-identifier");
-var stitchClient;
-
-  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
-  clientPromise.then(client => {
-    const db = client.service('mongodb', 'mongodb-atlas').db('transactions');
-    stitchClient = client;
-    //if (stitchClient.authedId()) {
-    //  stitchClient.logout();
-    //}
-  }).catch(err => console.log(err));
-
 email.addEventListener("focus", onEmailFocus);
 email.addEventListener("blur", onEmailBlur);
 email.addEventListener("input", onEmailInput);
 password.addEventListener("focus", onPasswordFocus);
 password.addEventListener("blur", onPasswordBlur);
-button.addEventListener("click", handleLogin)
+button.addEventListener("click", handleLogin);
 TweenMax.set(armL, {
 	x: -90,
 	y: 220,
