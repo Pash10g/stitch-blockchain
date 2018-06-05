@@ -169,8 +169,7 @@
             </div>
             <p />
             <div class="row">
-              <div class="assets-title">
-                Assets
+              <div class="assets-title">Assets
               </div>
               <div>
                 <span class="assets-dollar-suffix">$</span>
@@ -211,13 +210,13 @@
           <div class="share_settings">
             <form>
               <div class="checkbox">
-                <label><input type="checkbox" value="">Allow to share your Credit Score?</label>
+                <label><input type="checkbox" value="">Allow to share your Credit Score? <strong>(700 - 900)</strong></label>
               </div>
               <div class="checkbox">
-                <label><input type="checkbox" value="">Allow to share your Date of Birth?</label>
+                <label><input type="checkbox" value="">Allow to share your Asset Range? <strong> ($30000 - $50000)</strong></label>
               </div>
               <div class="checkbox">
-                <label><input type="checkbox" value="">Allow to share your User Info?</label>
+                <label><input type="checkbox" value="">Allow to share your Current Location? <strong>  1335 6th Ave, New York, NY 10019, USA </strong></label>
               </div>
             </form>
           </div>
@@ -253,9 +252,19 @@
             </div>
           </div>
           <div class="submit-settings-container">
-            <button type="button" class="btn btn-lg btn-success submit-settings-button">Share and Apply</button>
+            <!--button type="button" class="btn btn-lg btn-success submit-settings-button">Share and Apply</button-->
+	               <a class="btn btn-lg btn-success" href="#popup1">Share and Apply</a>
           </div>
-      </div>
+
+          <div id="popup1" class="overlay">
+        	<div class="popup">
+        		<h2>American Express offer</h2>
+        		<a class="close" href="#">&times;</a>
+        		<div class="content" style="height:250">
+        			<img style="height:140;width:300" src="offer.png"  />
+        		</div>
+        	</div>
+        </div>
   </div>
 </body>
 </html>
