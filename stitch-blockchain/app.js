@@ -16,7 +16,7 @@
     return stitchClient.login(email, password)
            .then(() => {
 						 console.log("in promise");
-						 assets_shared = [ "DOB" , "credit_score"];
+						 assets_shared = [ "assets_range" , "credit_score"];
 						stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000" );
             debugger;
             $("#login-status")[0].innerText = "Logged in... Submitting to blockchain...";

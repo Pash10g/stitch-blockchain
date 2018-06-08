@@ -311,7 +311,7 @@ class Blockchain{
 
 function main() {
   // Create Stitch class
-  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
+  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<id>');
 
   clientPromise.then(client => {
      const transactions = client.service('mongodb', 'mongodb-atlas').db('transactions');
@@ -324,7 +324,7 @@ function main() {
        nodes.updateOne({owner_id: client.authedId()}, {$set: producer}, {upsert:true}).then(() => {
 
        // Connect directly to the Atlas instance for changeStream
-        var uri = "mongodb://blockadmin:block123@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
+        var uri = "mongodb://<user>:<password>@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
         MongoClient.connect(uri, function(err, db) {
           console.log("#########################################");
           console.log("####  Node: " + client.authedId() + " is up and starting to produce at : " + new Date());
