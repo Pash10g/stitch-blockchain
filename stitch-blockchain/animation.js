@@ -3,6 +3,7 @@ var initAnimation=function(){
 var email = document.querySelector("#email"),
 	password = document.querySelector("#password"),
 	button = document.querySelector("#login-button"),
+	shareInfo = document.querySelector("#share-apply"),
 	form = document.querySelector("#login-form"),
 	icon = document.querySelector("#waiting"),
 	mySVG = document.querySelector(".svgContainer"),
@@ -28,7 +29,7 @@ var email = document.querySelector("#email"),
 	earHairL = document.querySelector(".earL .earHair"),
 	earHairR = document.querySelector(".earR .earHair"),
 	hair = document.querySelector(".hair");
-  
+
 var caretPos,
 	curEmailIndex,
 	screenCenter,
@@ -340,6 +341,7 @@ email.addEventListener("input", onEmailInput);
 password.addEventListener("focus", onPasswordFocus);
 password.addEventListener("blur", onPasswordBlur);
 button.addEventListener("click", handleLogin);
+shareInfo.addEventListener("click", handleSaveSettings);
 TweenMax.set(armL, {
 	x: -90,
 	y: 220,

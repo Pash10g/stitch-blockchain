@@ -175,7 +175,7 @@ class Blockchain{
 
             const logins_4_chainStream = logins_4_chainColl.watch(logins_4_chain_pipe,{fullDocument : "updateLookup" });
             var handleProfileNotification = (async function(change) {
-            console.log("Stream received!!! The received notification ip: " + change.fullDocument.blockchain_data.ip + " which was produced by country: " + change.fullDocument.blockchain_data.country_name + " loginTime: " + change.fullDocument.blockchain_data.loginTime);
+            console.log("Stream received!!! The received notification ip: " + change.fullDocument.blockchain_data.ipInformation.ip + " which was produced by country: " + change.fullDocument.blockchain_data.ipInformation.country_name + " loginTime: " + change.fullDocument.blockchain_data.loginTime);
              var docs =  await transactions.collection('profiles').find({"user_id" : change.fullDocument.user_id},{_id : 0}).execute().catch((err) => { console.log(err); });/*.then(docs => {*/
             if (docs.length > 0)
             {

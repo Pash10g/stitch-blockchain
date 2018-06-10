@@ -10,24 +10,41 @@
         $(".fa-spinner").addClass("waiting");
       });
     }
+
+  function handleSaveSettings() {
+    $(".fa-spinner").removeClass("waiting");
+    // Share settings with blockchain
+    var assets_shared = [ "assets_range" , "credit_score"];
+    stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000", "assets_share" );
+    $("#share-status")[0].innerText = "Privacy Settings Shared... Submitting to blockchain...";
+    setTimeout(function() {
+      $("#share-status")[0].innerText = "Block Submitted.";
+    }, 7000);
+    setTimeout(function() {
+      $("#share-status")[0].innerText = "";
+      console.log("moving to shared");
+      window.location = '#popup1';
+      $(".fa-spinner").addClass("waiting");
+    }, 12000);
+  }
+
   function emailPasswordAuth(email, password) {
-    console.log ("email:" + email , "password:" + password);
+    // Perfom the email/password login
     console.log(stitchClient);
     return stitchClient.login(email, password)
            .then(() => {
-						 console.log("in promise");
-						 assets_shared = [ "assets_range" , "credit_score"];
-						stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000" );
-            debugger;
+						 assets_shared = [];
+						stitchClient.executeFunction('populateUserInfo',assets_shared, "credit_card", "2099-01-01T00:00:00.000", "login" );
             $("#login-status")[0].innerText = "Logged in... Submitting to blockchain...";
             setTimeout(function() {
               $("#login-status")[0].innerText = "Block Submitted.";
-            }, 5000);
+            }, 7000);
             setTimeout(function() {
               $("#login-status")[0].innerText = "";
               console.log("moving to identified");
+              $(".fa-spinner").addClass("waiting");
               showForm("identified");
-								}, 10000);
+            }, 12000);
 
             setTimeout(function() {
               $("#login-status")[0].innerText = "";
@@ -51,9 +68,6 @@ function getLoginFormInfo() {
   // Parse out input text
   const email = emailEl.value;
   const password = passwordEl.value;
-  // Remove text from login boxes
-  //emailEl.value = "";
-  //passwordEl.value = "";
   return new Promise(resolve => resolve({ email: email, password: password }));
 }
 
@@ -84,11 +98,14 @@ window.onload = function() {
     })
 }
 
+// Get UI objects
 const loginForm = document.getElementById("login-form");
 const logoutButton = document.getElementById("logout-button");
 const statusMessage = document.getElementById("auth-type-identifier");
 var stitchClient;
 
+
+// Connect to stitch
   const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
   clientPromise.then(client => {
     const db = client.service('mongodb', 'mongodb-atlas').db('transactions');
