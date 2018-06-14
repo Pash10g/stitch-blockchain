@@ -46,11 +46,11 @@
               showForm("identified");
             }, 12000);
 
-            setTimeout(function() {
+           setTimeout(function() {
               $("#login-status")[0].innerText = "";
               console.log("moving to post-login");
               showForm("post-login");
-								}, 12000);
+            }, 15000);
 
             }).catch(err => {
 							$(".fa-spinner").addClass("waiting");

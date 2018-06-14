@@ -1,5 +1,5 @@
 .post-login-header {
-  background-color: #13AA52;
+  background-color: #69b340;
   padding-top: 50px;
   padding-bottom: 26px;
   color: #FFF;
@@ -8,7 +8,7 @@
 
 .fa-check {
   color: #FFF;
-  background-color: #13AA52;
+  background-color: #69b340;
   border-radius: 10px;
   font-size: 9pt;
 
@@ -21,21 +21,21 @@
 }
 
 .account_first {
-  background-color: #CC169F;
+  background-color: #f4758b;
   padding-bottom: 5px;
   padding-left: 5px;
   color: #FFF;
 }
 
 .account_second {
-  background-color: #16AECC;
+  background-color: #afafaf;
   padding-bottom: 5px;
   padding-left: 5px;
   color: #FFF;
 }
 
 .account_third {
-  background-color: #E6B219;
+  background-color: #f4758b;
   padding-bottom: 5px;
   padding-left: 5px;
   color: #FFF;
@@ -142,7 +142,6 @@ img.provider-logo:hover {
 }
 
 
-
 .overlay {
   position: fixed;
   top: 0;
@@ -193,4 +192,17 @@ img.provider-logo:hover {
 .popup .content {
   max-height: 30%;
   overflow: none;
+}
+
+.fingerprint-img {
+    vertical-align: middle;
+    height: 15%;
+}
+
+.map {
+  width: 370px;
+  height: 200px;
+  margin-top: 10%;
+  padding-left: 5;
+
 }

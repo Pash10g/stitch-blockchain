@@ -12,7 +12,8 @@
   <script src="./app.js"></script>
   <script src="./animation.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css' rel='stylesheet' />
 
 </head>
 <body>
@@ -146,7 +147,7 @@
       <!-- identified -->
       <div class="screen identified">
           <div class="identified-first">
-              <img src="verified.png" />
+              <img class="fingerprint-img" src="verified.png"  />
           </div>
           <div class="identified-second">
             Blockchain Verified
@@ -154,9 +155,19 @@
           <div class="identified-third">
             Accessing your account and eligible offers
           </div>
-          <div class="identified-fourth">
+          <!--div class="identified-fourth">
               <img src="verifiedmap.png" />
-          </div>
+          </div-->
+          <div id='map' class="map" ></div>
+          <script>
+          mapboxgl.accessToken = '<accessToken>';
+          var map = new mapboxgl.Map({
+              container: 'map',
+              center: [-73.975,40.761],
+              zoom: 16.00,
+              style: 'mapbox://styles/mapbox/streets-v9'
+          });
+          </script>
       </div>
       <!-- post-login user details -->
       <div class="screen post-login">
@@ -243,7 +254,7 @@
               </div>
               <div class="col-sm-4">
                 <div class="provider-logo-container">
-                  <img class="provider-logo" src="amex.jpg" height="50" width="80" />
+                  <img class="provider-logo" src="amex.png" height="50" width="80" />
                   <div class="logo-overlay">
                     <i class="fa fa-check"></i>
                   </div>

@@ -311,6 +311,7 @@ class Blockchain{
 
 function main() {
   // Create Stitch class
+   // IMPORTANT!!! Please replace with your appId
   const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<id>');
 
   clientPromise.then(client => {
@@ -324,6 +325,7 @@ function main() {
        nodes.updateOne({owner_id: client.authedId()}, {$set: producer}, {upsert:true}).then(() => {
 
        // Connect directly to the Atlas instance for changeStream
+       // IMPORTANT!!! Please replace with your Atlas URI and User/password 
         var uri = "mongodb://<user>:<password>@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
         MongoClient.connect(uri, function(err, db) {
           console.log("#########################################");
