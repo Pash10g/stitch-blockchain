@@ -300,19 +300,20 @@ class Blockchain{
             }
             // Once approved push approval to the store
             block.approvals.push(client.authedId());
-            transactions.collection('pending_blocks').updateOne({index: block.index},{$set: {"approvals" : block.approvals}}).then(()=>{
-            transactions.collection('pending_blocks').updateOne({index: block.index},{$set: { "approvedByMajority" : true} })}).catch(err => {/*console.error(err);*/});
-            return true;
+             transactions.collection('pending_blocks').updateOne({index: block.index},{$set: {"approvals" : block.approvals}}).then(()=> {
+             transactions.collection('pending_blocks').updateOne({index: block.index},{$set: { "approvedByMajority" : true} }).then(() => {return true;}).catch(err => {
+                                                console.log(chalk.yellow("Block #n: " + block.index  +" does not meet Majority yet..."));
+                                                return true;});
+                              }).catch(err => {console.error(err);});
+                return true;
           }
-
-    }
+}
 
 // main function
 
 function main() {
-  // Create Stitch class
-   // IMPORTANT!!! Please replace with your appId
-  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<id>');
+  // IMPORTANT!!! Please replace with your appId
+ const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<id>');
 
   clientPromise.then(client => {
      const transactions = client.service('mongodb', 'mongodb-atlas').db('transactions');
@@ -325,7 +326,7 @@ function main() {
        nodes.updateOne({owner_id: client.authedId()}, {$set: producer}, {upsert:true}).then(() => {
 
        // Connect directly to the Atlas instance for changeStream
-       // IMPORTANT!!! Please replace with your Atlas URI and User/password 
+       // IMPORTANT!!! Please replace with your Atlas URI and User/password
         var uri = "mongodb://<user>:<password>@blockchaindb-shard-00-00-vjsde.mongodb.net:27017,blockchaindb-shard-00-01-vjsde.mongodb.net:27017,blockchaindb-shard-00-02-vjsde.mongodb.net:27017/transactions?ssl=true&replicaSet=BlockchainDB-shard-0&authSource=admin";
         MongoClient.connect(uri, function(err, db) {
           console.log("#########################################");
