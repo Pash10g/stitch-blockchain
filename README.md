@@ -12,12 +12,12 @@ Using Stitch platform will allow us to design and build the next decentralize, t
 
 * The nodes will use the anonymous Stitch authentication consuming only public information. Each node is allowed to edit only its information while the node consensus will be enforced by Stitch functions. Notifications will be the main component that notifies subscribers and pushes the processes forward until completion.
 
-* End peers (example wallets) may use a variety of authentication mechanisms available by Stitch to keep their data private and encrypted.
+* End peers (example bank accounts) may use a variety of authentication mechanisms available by Stitch to keep their data private and encrypted.
 
 # Configuring and running
 1. Setup an Atlas cluster and stitch. See the following [documentation](https://docs.mongodb.com/stitch/getting-started/).
 2. [Import](https://docs.mongodb.com/stitch/import-export/create-stitch-app/) the stitch skelaton app from this repo: stitch-blockchain.zip.
-3. Create the following view in your cluster under database `transactions`:
+3. Create the following view and index in your cluster under database `transactions`:
 ```
 db.createView("blockchain","pending_blocks",
 			[	{
@@ -58,9 +58,16 @@ db.createView("blockchain","pending_blocks",
 					}
 				}
 			]);
+
+db.pending_blocks.createIndex({index : 1},{unique : true});
+
 ```
-4. Create a mongodb readOnly user on all databases. Verify that the cluster name in the imported application is associated with your cluster name.
-5. Edit the `main.js` file with the MongoDB credentials created in step 1 and the correct connection string for your Atlas cluster. Run the production of the blocks with:
+4. Create a mongodb readWrite user on databases: `transactions`,`assets`. Verify that the cluster name in the imported application is associated with your cluster name.
+5. Edit the `main.js` file with the MongoDB credentials created in step 1 and the correct connection string for your Atlas cluster/ Stitch appId. Run the production of the blocks with:
 ```
+npm install
 node main.js
 ```
+6. Create a stitch email/password credentials through Authentication tab.
+7. Edit the dummy `stitch-blockchain/app.js` application  with your stitch <appId>.
+8. Open the application `stitch-blockchain/mobileendppoint.html` and input the credentials created in step 6. The blockchain should now work.

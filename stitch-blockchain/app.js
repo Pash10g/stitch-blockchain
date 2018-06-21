@@ -106,7 +106,8 @@ var stitchClient;
 
 
 // Connect to stitch
-  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
+// IMPORTANT please replace <appId> with your appId.
+  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<appId>');
   clientPromise.then(client => {
     const db = client.service('mongodb', 'mongodb-atlas').db('transactions');
     stitchClient = client;
