@@ -19,13 +19,13 @@
     $("#share-status")[0].innerText = "Privacy Settings Shared... Submitting to blockchain...";
     setTimeout(function() {
       $("#share-status")[0].innerText = "Block Submitted.";
-    }, 7000);
+    }, 3000);
     setTimeout(function() {
       $("#share-status")[0].innerText = "";
       console.log("moving to shared");
       window.location = '#popup1';
       $(".fa-spinner").addClass("waiting");
-    }, 12000);
+    }, 7000);
   }
 
   function emailPasswordAuth(email, password) {
@@ -38,19 +38,19 @@
             $("#login-status")[0].innerText = "Logged in... Submitting to blockchain...";
             setTimeout(function() {
               $("#login-status")[0].innerText = "Block Submitted.";
-            }, 7000);
+            }, 3000);
             setTimeout(function() {
               $("#login-status")[0].innerText = "";
               console.log("moving to identified");
               $(".fa-spinner").addClass("waiting");
               showForm("identified");
-            }, 12000);
+            }, 5000);
 
            setTimeout(function() {
               $("#login-status")[0].innerText = "";
               console.log("moving to post-login");
               showForm("post-login");
-            }, 15000);
+            }, 8000);
 
             }).catch(err => {
 							$(".fa-spinner").addClass("waiting");
@@ -106,8 +106,7 @@ var stitchClient;
 
 
 // Connect to stitch
-// IMPORTANT please replace <appId> with your appId.
-  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-<appId>');
+  const clientPromise = stitch.StitchClientFactory.create('stitch-blockchain-hpfqm');
   clientPromise.then(client => {
     const db = client.service('mongodb', 'mongodb-atlas').db('transactions');
     stitchClient = client;
