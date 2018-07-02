@@ -28,8 +28,7 @@ Using Stitch platform will allow us to design and build the next decentralize, t
 db.createView("blockchain","pending_blocks",
 			[	{
 					"$match" : {
-						"index" : 0,
-						"approvedByMajority" : true
+						"index" : 0
 					}
 				},
 				{
